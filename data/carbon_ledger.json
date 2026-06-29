@@ -1,0 +1,16 @@
+{
+  "zone": "IE",
+  "sessions": {
+    "5f1b774e-5070-4427-8c9a-5a0ce238d73c": {
+      "estimated_wh": 996.3147,
+      "estimated_gco2": 259.0418,
+      "carbon_intensity_used": 260.0,
+      "output_tokens": 51277,
+      "input_tokens": 229,
+      "cache_write_tokens": 175087,
+      "cache_read_tokens": 6233959,
+      "total_tokens": 6460552,
+      "processed_at": "2026-06-29T09:58:49Z"
+    }
+  }
+}

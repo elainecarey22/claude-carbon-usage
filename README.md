@@ -62,6 +62,32 @@ CLAUDE_WH_PER_1K_CACHE_WRITE=1.25
 CLAUDE_WH_PER_1K_CACHE_READ=0.1
 ```
 
+## Example output
+
+Running `project_total.py` against this repository itself:
+
+```
+$ python scripts/project_total.py
+
+  ──────────────────────────────────────────────────────────
+  Project Carbon Ledger — carbon_ledger.json
+  ──────────────────────────────────────────────────────────
+
+  Sessions tracked:  1
+  Total tokens:      6,460,552
+  Total energy:      996.31 Wh
+  Total carbon:      259.04 gCO₂
+
+  Per-session breakdown:
+    5f1b774e…   6,460,552 tokens    259.04 gCO₂
+
+  ──────────────────────────────────────────────────────────
+  TOTAL                                 259.04 gCO₂
+  ──────────────────────────────────────────────────────────
+```
+
+*Measured against the Ireland grid at 260 gCO₂/kWh on 2026-06-29.*
+
 ## Project structure
 
 ```
