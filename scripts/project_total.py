@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from dotenv import load_dotenv
 from claude_energy import summarise_usage, wh_to_gco2
-from electricity_maps import get_carbon_intensity_live
+from electricity_maps import DEFAULT_ZONE, get_carbon_intensity_live, zone_label
 from session_reader import list_sessions, session_usage
 
 load_dotenv()
@@ -39,7 +39,7 @@ def load_ledger() -> dict:
     if _LEDGER_PATH.exists():
         with _LEDGER_PATH.open() as f:
             return json.load(f)
-    return {"zone": "IE", "sessions": {}}
+    return {"zone": DEFAULT_ZONE, "sessions": {}}
 
 
 def save_ledger(ledger: dict) -> None:
@@ -150,7 +150,22 @@ def main() -> None:
 
     ledger = {} if args.reprocess else load_ledger()
     if not ledger:
-        ledger = {"zone": "IE", "sessions": {}}
+        ledger = {"zone": DEFAULT_ZONE, "sessions": {}}
+
+    if args.reprocess:
+        # Starting fresh — adopt the currently configured zone.
+        ledger["zone"] = DEFAULT_ZONE
+    elif ledger.get("zone") != DEFAULT_ZONE and ledger["sessions"]:
+        # The configured region changed after the ledger was built. Keep the
+        # original zone so the cumulative total stays consistent (mixing grids
+        # would be misleading); re-run with --reprocess to switch entirely.
+        print(
+            f"\n  Note: configured zone is {DEFAULT_ZONE} but this ledger was "
+            f"built with {ledger['zone']}.\n"
+            f"  Keeping {ledger['zone']} for consistency — "
+            f"run with --reprocess to recalculate everything in {DEFAULT_ZONE}.",
+            file=sys.stderr,
+        )
 
     all_sessions = list_sessions(args.project)
     if not all_sessions:
@@ -163,9 +178,11 @@ def main() -> None:
     newly_added: list[str] = []
 
     if new_sessions:
-        print(f"\n  {len(new_sessions)} new session(s) to process. Fetching live IE carbon intensity...")
+        zone = ledger.get("zone", DEFAULT_ZONE)
+        print(f"\n  {len(new_sessions)} new session(s) to process. "
+              f"Fetching live {zone_label(zone)} ({zone}) carbon intensity...")
         try:
-            data = get_carbon_intensity_live(zone=ledger.get("zone", "IE"))
+            data = get_carbon_intensity_live(zone=zone)
             carbon_intensity = float(data["carbonIntensity"])
             print(f"  Grid intensity: {carbon_intensity:.0f} gCO₂/kWh (used for new sessions)")
         except Exception as e:
