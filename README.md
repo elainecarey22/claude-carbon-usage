@@ -73,20 +73,22 @@ $ python scripts/project_total.py
   Project Carbon Ledger — carbon_ledger.json
   ──────────────────────────────────────────────────────────
 
-  Sessions tracked:  1
-  Total tokens:      6,460,552
-  Total energy:      996.31 Wh
-  Total carbon:      259.04 gCO₂
+  Sessions tracked:  3
+  Total tokens:      13,428,678
+  Total energy:      2,483.90 Wh
+  Total carbon:      690.44 gCO₂
 
   Per-session breakdown:
+    6819691e…   4,568,606 tokens    218.36 gCO₂
+    fae3e244…   2,399,520 tokens    213.04 gCO₂
     5f1b774e…   6,460,552 tokens    259.04 gCO₂
 
   ──────────────────────────────────────────────────────────
-  TOTAL                                 259.04 gCO₂
+  TOTAL                                 690.44 gCO₂
   ──────────────────────────────────────────────────────────
 ```
 
-*Measured against the Ireland grid at 260 gCO₂/kWh on 2026-06-29.*
+*Measured against the Ireland grid (290–260 gCO₂/kWh) across sessions on 2026-06-26 and 2026-06-29.*
 
 ## Project structure
 

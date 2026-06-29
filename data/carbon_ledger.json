@@ -1,6 +1,28 @@
 {
   "zone": "IE",
   "sessions": {
+    "6819691e-0047-4c0f-be76-27a08144541a": {
+      "estimated_wh": 752.971,
+      "estimated_gco2": 218.3616,
+      "carbon_intensity_used": 290.0,
+      "output_tokens": 65224,
+      "input_tokens": 2450,
+      "cache_write_tokens": 91092,
+      "cache_read_tokens": 4409840,
+      "total_tokens": 4568606,
+      "processed_at": "2026-06-26T14:38:50Z"
+    },
+    "fae3e244-ec1d-49e2-a44e-691e25ebb0aa": {
+      "estimated_wh": 734.6148,
+      "estimated_gco2": 213.0383,
+      "carbon_intensity_used": 290.0,
+      "output_tokens": 18674,
+      "input_tokens": 126,
+      "cache_write_tokens": 382952,
+      "cache_read_tokens": 1997768,
+      "total_tokens": 2399520,
+      "processed_at": "2026-06-26T14:38:50Z"
+    },
     "5f1b774e-5070-4427-8c9a-5a0ce238d73c": {
       "estimated_wh": 996.3147,
       "estimated_gco2": 259.0418,
