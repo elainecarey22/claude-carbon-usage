@@ -14,5 +14,8 @@ outputs/
 data/raw/
 data/processed/
 
+# Carbon-tracking hook log
+data/carbon_hook.log
+
 # macOS
 .DS_Store

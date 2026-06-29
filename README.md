@@ -106,6 +106,98 @@ $ python scripts/project_total.py
 
 *Measured against the Ireland grid (290–260 gCO₂/kWh) across sessions on 2026-06-26 and 2026-06-29.*
 
+## Machine-wide tracking
+
+`project_total.py` tracks a single project. To accumulate the carbon cost of
+*every* Claude Code session across *all* your projects, use `carbon_track.py`,
+which records each session into one central SQLite database at
+`~/.claude/carbon/usage.db`.
+
+It runs automatically when a session ends, via a Claude Code
+[**SessionEnd hook**](https://docs.claude.com/en/docs/claude-code/hooks) — a
+command Claude Code invokes for you at a lifecycle event. You set it up once.
+
+### Setting up the hook
+
+1. **Finish the [Setup](#setup) above** — `carbon_track.py` runs through this
+   project's virtualenv and reads its `.env` (for the API key and zone), so
+   the venv and `.env` must exist.
+
+2. **Note two absolute paths** (the hook can't use relative paths, because it
+   runs from whatever project you're in, not from this repo):
+   - your Python interpreter: `<repo>/.venv/bin/python`
+   - the tracker script: `<repo>/scripts/carbon_track.py`
+
+   Print them with:
+
+   ```bash
+   echo "$(pwd)/.venv/bin/python"
+   echo "$(pwd)/scripts/carbon_track.py"
+   ```
+
+3. **Add the hook to `~/.claude/settings.json`** (create the file if it doesn't
+   exist), substituting the two paths from step 2:
+
+   ```json
+   {
+     "hooks": {
+       "SessionEnd": [
+         {
+           "hooks": [
+             {
+               "type": "command",
+               "command": "/abs/path/to/.venv/bin/python /abs/path/to/scripts/carbon_track.py >> ~/.claude/carbon/track.log 2>&1",
+               "async": true
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+   `async: true` keeps it off the critical path so ending a session is never
+   delayed. The `>> …track.log` redirect captures output, since a hook has no
+   console to print to.
+
+4. **Reload** — open a fresh Claude Code session (or run `/hooks` once) so the
+   new configuration is picked up.
+
+That's it. From now on every session you run — in any project — appends its
+estimated carbon to the central database when it ends.
+
+### Reading the totals
+
+```bash
+python scripts/carbon_track.py --report
+```
+
+```
+  Machine-wide Claude Code Carbon — all projects
+
+  Sessions tracked:  1
+  Total tokens:      9,229,533
+  Total energy:      1.563 kWh
+  Total carbon:      529.77 gCO₂
+
+  By project:
+    claude-carbon-usage    1 sess     9,229,533 tok   529.77 gCO₂
+```
+
+If the hook ever seems quiet, check `~/.claude/carbon/track.log` for errors.
+You can also record a transcript by hand (useful for backfilling):
+
+```bash
+python scripts/carbon_track.py --transcript ~/.claude/projects/<dir>/<session>.jsonl
+```
+
+Records are keyed by session id (upserted), so re-running is safe. If the grid
+API is unavailable, energy is still recorded and carbon is left blank.
+
+This repository keeps its own per-project ledger (`data/carbon_ledger.json`,
+committed) *as well as* feeding the machine-wide database — so the carbon cost
+of building this project stays transparent in the repo.
+
 ## Project structure
 
 ```
@@ -117,7 +209,8 @@ claude-carbon-usage/
 ├── scripts/
 │   ├── carbon_now.py        # Report carbon footprint for a session
 │   ├── compare_regions.py   # Compare footprint across grid regions
-│   └── project_total.py     # Cumulative carbon ledger for the project
+│   ├── project_total.py     # Cumulative carbon ledger for the project
+│   └── carbon_track.py      # Machine-wide tracker (central SQLite db)
 ├── data/
 │   └── carbon_ledger.json   # Persistent per-session carbon log
 ├── .env.example
