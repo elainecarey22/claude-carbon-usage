@@ -107,8 +107,9 @@ def report(usage: dict, carbon_intensity: float, label: str = "Session", zone: s
     print(f"  {_bar(gco2, ref * 2)} {_fmt_gco2(gco2)}")
     print(f"  {'─' * 52}")
     print()
-    print("  Note: energy figures are estimates (±order of magnitude).")
-    print("  See src/claude_energy.py to adjust Wh/token rates.")
+    print("  Note: energy is a rough estimate (±an order of magnitude); the grid")
+    print("  intensity is measured. Best for relative comparison, not absolute")
+    print("  numbers — see 'How accurate is this?' in the README.")
     print()
 
 

@@ -2,6 +2,13 @@
 
 Compare the estimated energy cost of your Claude Code sessions against the live carbon intensity of your local electricity grid. Defaults to Ireland (zone `IE`); set your own region with `ELECTRICITY_MAPS_ZONE` or `--zone`.
 
+> ⚠️ **These are order-of-magnitude estimates, not measurements.** Anthropic
+> doesn't publish real per-token server energy, so the absolute gCO₂ figures
+> could be off by 10× or more. Treat them as a way to compare *relative* cost —
+> between regions, between sessions, or over time — not as an authoritative
+> carbon number. See [How accurate is this?](#how-accurate-is-this) before you
+> quote a figure.
+
 ## What it does
 
 - Reads token usage from Claude Code session transcripts (`~/.claude/projects/`)
@@ -78,6 +85,39 @@ CLAUDE_WH_PER_1K_CACHE_WRITE=1.25
 CLAUDE_WH_PER_1K_CACHE_READ=0.1
 ```
 
+## How accurate is this?
+
+Short version: **the grid carbon intensity is solid; the energy estimate is
+not.** Here's where the uncertainty actually lives.
+
+**The energy model (high uncertainty).** The Wh/token rates above are
+order-of-magnitude figures drawn from published inference research — not
+measurements of Anthropic's infrastructure. Real per-token energy depends on
+the model, the hardware, batching, and data-centre efficiency, none of which
+Anthropic publishes. The absolute energy — and therefore carbon — could
+plausibly be wrong by 10× in either direction.
+
+**Cache reads dominate, and they're the softest number.** Claude Code sessions
+are cache-heavy: most of the "tokens" in a session are cache reads, not freshly
+generated output. A multi-million-token session is largely the same context
+being re-read each turn. Those are priced at the lowest rate (0.1 Wh/1k), so the
+*largest* token bucket carries the *least* certain rate. Read the headline token
+count with that in mind.
+
+**The grid intensity is well-grounded.** The gCO₂/kWh comes from Electricity
+Maps' live measured grid data, which is genuinely accurate for the zone and
+moment. The conversion *from energy to carbon* is sound — it's the energy input
+that's fuzzy.
+
+**Good for** — relative comparison, where the model error largely cancels out:
+- the same workload across grid regions (`compare_regions.py`)
+- watching your own usage trend over time
+- order-of-magnitude intuition ("grams, not kilograms, per session")
+
+**Not good for** — any claim that needs a trustworthy absolute number: carbon
+offsetting, sustainability reporting, or "Claude used exactly *X* grams." Don't
+use it for those.
+
 ## Example output
 
 Running `project_total.py` against this repository itself:
@@ -104,7 +144,7 @@ $ python scripts/project_total.py
   ──────────────────────────────────────────────────────────
 ```
 
-*Measured against the Ireland grid (290–260 gCO₂/kWh) across sessions on 2026-06-26 and 2026-06-29.*
+*Estimated energy priced against live Ireland grid intensity (290–260 gCO₂/kWh) across sessions on 2026-06-26 and 2026-06-29. The grid figures are measured; the energy — and so the carbon — is a rough estimate (see [How accurate is this?](#how-accurate-is-this)).*
 
 ## Machine-wide tracking
 

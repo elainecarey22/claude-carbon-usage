@@ -134,6 +134,8 @@ def print_report(ledger: dict, newly_added: list[str]) -> None:
     print(f"  {'─' * 58}")
     print()
     print(f"  Ledger saved to: {_LEDGER_PATH}")
+    print(f"  Energy is a rough estimate (±an order of magnitude); see the")
+    print(f"  README's 'How accurate is this?' section.")
     print()
 
 

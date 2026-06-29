@@ -209,6 +209,8 @@ def report(con: sqlite3.Connection) -> None:
     print(f"  TOTAL  {_fmt_gco2(total_gco2):>46}")
     print(f"  {'─' * 62}")
     print(f"  Database: {_DEFAULT_DB}")
+    print(f"  Energy is a rough estimate (±an order of magnitude); the grid")
+    print(f"  intensity is measured. See the README's 'How accurate is this?'.")
     print()
 
 
