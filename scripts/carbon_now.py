@@ -3,13 +3,17 @@
 carbon_now.py
 -------------
 Report the estimated carbon footprint of a Claude Code session against
-the live Ireland grid carbon intensity.
+the live carbon intensity of your electricity grid region.
+
+The grid region defaults to IE (Ireland). Set ELECTRICITY_MAPS_ZONE in
+your environment, or pass --zone, to use a different region.
 
 Usage:
   python scripts/carbon_now.py                          # current project, latest session
   python scripts/carbon_now.py --all                    # all sessions for this project
   python scripts/carbon_now.py --session <id>           # specific session
   python scripts/carbon_now.py --project <path>         # different project path
+  python scripts/carbon_now.py --zone US-CAL-CISO       # use a specific grid region
   python scripts/carbon_now.py --tokens 1000 500        # manual token input (input output)
 """
 
@@ -23,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from dotenv import load_dotenv
 from claude_energy import summarise_usage, wh_to_gco2
-from electricity_maps import get_carbon_intensity_live
+from electricity_maps import DEFAULT_ZONE, get_carbon_intensity_live, zone_label
 from session_reader import list_sessions, project_usage, session_usage
 
 load_dotenv()
@@ -69,7 +73,7 @@ def _fmt_gco2(gco2: float) -> str:
     return f"{gco2:.2f} gCO₂"
 
 
-def report(usage: dict, carbon_intensity: float, label: str = "Session") -> None:
+def report(usage: dict, carbon_intensity: float, label: str = "Session", zone: str = DEFAULT_ZONE) -> None:
     s = summarise_usage(usage)
     gco2 = wh_to_gco2(s["estimated_wh"], carbon_intensity)
 
@@ -83,7 +87,8 @@ def report(usage: dict, carbon_intensity: float, label: str = "Session") -> None
     print(f"  Claude Code Carbon Report — {label}")
     print(f"  {'─' * 52}")
     print()
-    print(f"  Ireland grid now:  {carbon_intensity:>6.0f} gCO₂/kWh  [{_grid_label(carbon_intensity)}]")
+    grid_name = f"{zone_label(zone)} grid now:"
+    print(f"  {grid_name:<18} {carbon_intensity:>6.0f} gCO₂/kWh  [{_grid_label(carbon_intensity)}]")
     print()
     print(f"  Token breakdown ({total_tokens:,} total):")
     print(f"    Output          {s['output_tokens']:>10,}  (generation)")
@@ -108,7 +113,7 @@ def report(usage: dict, carbon_intensity: float, label: str = "Session") -> None
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Claude Code carbon footprint vs Ireland grid")
+    parser = argparse.ArgumentParser(description="Claude Code carbon footprint vs your electricity grid")
     parser.add_argument("--project", default=".", help="project path (default: current directory)")
     parser.add_argument("--session", default=None, help="specific session ID")
     parser.add_argument("--all", action="store_true", help="aggregate all sessions for the project")
@@ -116,7 +121,11 @@ def main() -> None:
         "--tokens", nargs=2, metavar=("INPUT", "OUTPUT"), type=int,
         help="manual token counts: --tokens <input> <output>",
     )
-    parser.add_argument("--zone", default="IE", help="Electricity Maps zone (default: IE)")
+    parser.add_argument(
+        "--zone", default=DEFAULT_ZONE,
+        help=f"Electricity Maps zone code (default: {DEFAULT_ZONE}, "
+             "or set ELECTRICITY_MAPS_ZONE)",
+    )
     args = parser.parse_args()
 
     # Fetch live carbon intensity
@@ -160,7 +169,7 @@ def main() -> None:
         usage = session_usage(latest)
         label = f"Latest session ({latest.stem[:8]}…)"
 
-    report(usage, carbon_intensity, label=label)
+    report(usage, carbon_intensity, label=label, zone=args.zone)
 
 
 if __name__ == "__main__":

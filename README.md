@@ -1,12 +1,12 @@
 # claude-carbon-usage
 
-Compare the estimated energy cost of your Claude Code sessions against the live carbon intensity of the Ireland electricity grid (zone `IE`).
+Compare the estimated energy cost of your Claude Code sessions against the live carbon intensity of your local electricity grid. Defaults to Ireland (zone `IE`); set your own region with `ELECTRICITY_MAPS_ZONE` or `--zone`.
 
 ## What it does
 
 - Reads token usage from Claude Code session transcripts (`~/.claude/projects/`)
 - Estimates server-side energy consumption using a configurable Wh/token model
-- Fetches the live Ireland grid carbon intensity via the [Electricity Maps](https://www.electricitymaps.com/) API
+- Fetches your grid's live carbon intensity via the [Electricity Maps](https://www.electricitymaps.com/) API
 - Reports estimated gCO₂ for the session
 
 ## Setup
@@ -21,6 +21,22 @@ cp .env.example .env
 ```
 
 Get a free API key at [electricitymaps.com](https://www.electricitymaps.com/free-tier-api). Note: free tier API keys only last 14 days.
+
+## Choosing your grid region
+
+By default the tool prices energy against the Ireland grid (`IE`). To use your own region, set the [Electricity Maps zone code](https://api.electricitymap.org/v3/zones) — either persistently in `.env`:
+
+```
+ELECTRICITY_MAPS_ZONE=US-CAL-CISO
+```
+
+or per-run with the `--zone` flag:
+
+```bash
+python scripts/carbon_now.py --zone GB
+```
+
+Common zones: `GB` (Great Britain), `FR` (France), `DE` (Germany), `US-CAL-CISO` (California), `US-NY-NYIS` (New York). The `--zone` flag overrides `ELECTRICITY_MAPS_ZONE`.
 
 ## Usage
 
