@@ -1,4 +1,4 @@
-# home-energy-carbon
+# claude-carbon-usage
 
 Compare the estimated energy cost of your Claude Code sessions against the live carbon intensity of the Ireland electricity grid (zone `IE`).
 
@@ -65,13 +65,17 @@ CLAUDE_WH_PER_1K_CACHE_READ=0.1
 ## Project structure
 
 ```
-home-energy-carbon/
+claude-carbon-usage/
 ├── src/
-│   ├── electricity_maps.py  # Electricity Maps API client (live + history)
 │   ├── claude_energy.py     # Wh/token energy model
+│   ├── electricity_maps.py  # Electricity Maps API client
 │   └── session_reader.py    # Read Claude Code session transcripts
 ├── scripts/
-│   └── carbon_now.py        # Main CLI
+│   ├── carbon_now.py        # Report carbon footprint for a session
+│   ├── compare_regions.py   # Compare footprint across grid regions
+│   └── project_total.py     # Cumulative carbon ledger for the project
+├── data/
+│   └── carbon_ledger.json   # Persistent per-session carbon log
 ├── .env.example
 └── requirements.txt
 ```
