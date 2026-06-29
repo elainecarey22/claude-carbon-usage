@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated outputs and raw/processed data
+outputs/
+data/raw/
+data/processed/
+
+# macOS
+.DS_Store
